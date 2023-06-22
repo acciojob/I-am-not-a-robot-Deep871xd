@@ -1,103 +1,91 @@
-const imageUrls = [
-  "url_to_image_1",
-  "url_to_image_1",
-  "url_to_image_2",
-  "url_to_image_3",
-  "url_to_image_4",
-  "url_to_image_5",
-];
+//your JS code here. If required.
+let resetbtn = document.querySelector("#reset");
+let verifybtn = document.querySelector("#verify");
 
-let selectedImages = [];
-let selectedIndexes = [];
 
-function renderImages() {
-  const imageContainer = document.getElementById("imageContainer");
-  imageContainer.innerHTML = "";
+let imgtag = document.createElement("img");
+let randomvalue = Math.floor(Math.random()*5) +1;
+imgtag.setAttribute("class",`img${randomvalue}`);
+document.querySelector(".flex").appendChild(imgtag);
 
-  const randomIndexes = generateRandomIndexes(6);
-  selectedIndexes = randomIndexes.slice(0, 5);
-  const repeatIndex = randomIndexes[5];
 
-  for (let i = 0; i < randomIndexes.length; i++) {
-    const img = document.createElement("img");
-    img.src = imageUrls[randomIndexes[i]];
-    img.className = "img" + (i + 1);
+let images = document.querySelectorAll("img");
 
-    img.addEventListener("click", () => {
-      if (selectedImages.length === 2) {
-        return;
-      }
+images.forEach((image) => {
+    image.addEventListener("click", () => {
+        image.classList.toggle("selected");
 
-      if (!selectedIndexes.includes(i)) {
-        return;
-      }
+        if(isrestbtnvalid()){
+         resetbtn.style.display="inline-block";
+        }
+        else{
+            resetbtn.style.display="none";
+        }
 
-      if (selectedImages.includes(i)) {
-        return;
-      }
+        if(isverifybtnvalid()){
+            verifybtn.style.display="inline-block";
+           }
+           else{
+               verifybtn.style.display="none";
+           }
 
-      selectedImages.push(i);
-      img.classList.add("selected");
-
-      if (selectedImages.length === 2) {
-        document.getElementById("verify").style.display = "inline";
-      }
     });
 
-    imageContainer.appendChild(img);
-  }
-
-  // Reset the state
-  selectedImages = [];
-  document.getElementById("reset").style.display = "none";
-  document.getElementById("verify").style.display = "none";
-  document.getElementById("para").textContent = "";
-}
-
-function generateRandomIndexes(max) {
-  const indexes = [];
-
-  while (indexes.length < max) {
-    const randomIndex = Math.floor(Math.random() * max);
-
-    if (!indexes.includes(randomIndex)) {
-      indexes.push(randomIndex);
+});
+function isrestbtnvalid(){
+    for(let i=0;i<images.length;i++){
+        if(images[i].classList.contains("selected")){
+            return true;
+        }      
     }
-  }
-
-  return indexes;
+    return false;
 }
 
-function resetState() {
-  selectedImages = [];
-  document.getElementById("reset").style.display = "none";
-  document.getElementById("verify").style.display = "none";
-  document.getElementById("para").textContent = "";
-
-  const selectedImagesElements = document.getElementsByClassName("selected");
-  while (selectedImagesElements.length > 0) {
-    selectedImagesElements[0].classList.remove("selected");
-  }
-}
-
-function verifySelection() {
-  const para = document.getElementById("para");
-  if (selectedImages.length === 2) {
-    if (selectedImages[0] === selectedImages[1]) {
-      para.textContent = "You are a human. Congratulations!";
-    } else {
-      para.textContent = "We can't verify you as a human. You selected the non-identical tiles.";
+function isverifybtnvalid(){
+    let count=0;
+    for(let i=0;i<images.length;i++){
+        if(images[i].classList.contains("selected")){
+            count++;
+        }      
     }
-  }
-
-  document.getElementById("verify").style.display = "none";
+    return (count==2);
 }
 
-// Event listener for the Reset button
-document.getElementById("reset").addEventListener("click", resetState);
+resetbtn.addEventListener("click", () => {
+    for(let i=0;i<images.length;i++){
+        if(images[i].classList.contains("selected")){
+            images[i].classList.remove("selected");
+        }      
+    }
+    resetbtn.style.display="none";
 
-// Event listener for the Verify button
-document.getElementById("verify").addEventListener("click", verifySelection);
+    let ps = document.querySelectorAll("p");
+    ps.forEach((p) =>{
+        document.querySelector("main").removeChild(p);
+    });
+    
+});
 
-// Initial render
-renderImages();
+verifybtn.addEventListener("click", () => {
+    let p = document.createElement("p");
+    p.setAttribute("id","para");
+
+
+  let classarr = document.querySelectorAll(".selected");
+  if(classarr[0].getAttribute("class")==classarr[1].getAttribute("class")){
+     p.innerText = "You are a human. Congratulations!"
+  }
+  else{
+    p.innerText = "We can't verify you as a human. You selected the non-identical tiles."
+  }
+
+  document.querySelector("main").appendChild(p);
+  verifybtn.style.display="none";
+
+  for(let i=0;i<images.length;i++){
+    if(images[i].classList.contains("selected")){
+        images[i].classList.remove("selected");
+    }      
+ }
+   
+});
